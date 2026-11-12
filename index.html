@@ -181,8 +181,9 @@ button{font:inherit}
 .vbox.err .verr{display:flex}
 .vclose{font-family:var(--disp);font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:linear-gradient(180deg,#3d5afe,#161ca8);border:1px solid #8fa4ff;padding:12px 26px;cursor:pointer;transform:skewX(-8deg);box-shadow:0 0 16px rgba(61,90,254,.9)}
 @media (max-width:800px){
- .vmodal{flex-direction:row;align-items:flex-start;justify-content:center;gap:10px;padding:12px 10px}
+ .vmodal{flex-direction:row;align-items:flex-start;justify-content:center;gap:10px;padding:12px 10px;overflow:auto}
  .vside{order:1;width:28vw;max-width:260px;gap:8px}
+ .vpic{display:block}
  .vmain{order:2;flex:1 1 0;min-width:0;width:auto;gap:12px}
  .vbox{width:100%;max-width:calc(76svh*9/16)}
  .vname{font-size:clamp(20px,6.4vw,34px)}
@@ -222,6 +223,36 @@ button{font:inherit}
  .info{position:relative;background:none;transform:none;opacity:1;padding:calc(var(--u)*4)}
  .info b{font-size:calc(var(--u)*14)}.info i{font-size:calc(var(--u)*3)}.info p{font-size:calc(var(--u)*3.6)}
 }
+
+/* ===== celular: tudo numa tela só ===== */
+.mduo{display:none}
+@media (max-width:700px){
+ :root{--w:min(94vw,calc((100svh - 16px)*9/16.9))}
+ body{align-items:center;padding:0}
+ .env{height:calc(var(--u)*186);margin:0}
+ .card{position:absolute;inset:0;height:100%}
+ .flap{display:none!important}
+ .dummy{justify-content:flex-end}
+ .mduo{display:flex;justify-content:center;align-items:flex-end;width:100%;flex:1;min-height:0}
+ .mph{position:relative;flex:0 0 auto;height:100%;aspect-ratio:560/630;max-width:47%;background:none;border:0;padding:0;color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent}
+ .mph+.mph{margin-left:calc(var(--u)*3)}
+ .mph.cont{z-index:2}
+ .mph img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 0 calc(var(--u)*2.5) rgba(61,90,254,.9))}
+ .mph:active img{transform:scale(1.04)}
+ .mph:focus-visible{outline:2px solid #fff;outline-offset:2px}
+ .tag{position:absolute;left:50%;bottom:calc(var(--u)*.5);transform:translateX(-50%) skewX(-8deg);display:flex;align-items:center;gap:calc(var(--u)*1);white-space:nowrap;font-family:var(--disp);letter-spacing:.12em;font-size:calc(var(--u)*2.4);text-transform:uppercase;padding:calc(var(--u)*.9) calc(var(--u)*2.2);background:rgba(2,3,30,.9);border:1px solid var(--neon);box-shadow:0 0 calc(var(--u)*2) rgba(61,90,254,.9);color:#dbe2ff;z-index:3}
+ .tag i{font-style:normal;color:#6c8cff}
+ .dummy .chips{flex-direction:row;width:84%;gap:calc(var(--u)*2);margin-top:calc(var(--u)*1.5)}
+ /* vídeo cabe na tela sem rolar */
+ .vmodal{flex-direction:row;align-items:flex-start;justify-content:center;gap:10px;padding:12px 10px;overflow:auto}
+ .vside{order:1;width:28vw;max-width:260px;gap:8px}
+ .vpic{display:block}
+ .vmain{order:2;flex:1 1 0;min-width:0;width:auto;gap:12px}
+ .vbox{width:100%;max-width:calc(76svh*9/16)}
+ .vname{font-size:clamp(20px,6.4vw,34px)}
+ .vtext{font-size:clamp(10px,2.9vw,13px);line-height:1.45}
+ .vclose{font-size:12px;padding:10px 14px}
+}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important}}
 </style>
 </head>
@@ -248,7 +279,7 @@ button{font:inherit}
       <div class="fs">Funkstation</div>
       <div class="sub">Festa de Aniversário</div>
 
-      <div class="dummy"><div class="chips">
+      <div class="dummy"><div class="mduo"><button class="mph cont" type="button" data-who="cont" aria-label="Ver o convite do Cont em vídeo"><img alt="Cont"><span class="tag"><i>▶</i> Cont</span></button><button class="mph bet" type="button" data-who="bettega" aria-label="Ver o convite do Bettega em vídeo"><img alt="Bettega"><span class="tag"><i>▶</i> Bettega</span></button></div><div class="chips">
         <div class="chip"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>21/11</span></div>
         <div class="chip"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>20H</span></div>
       </div></div>
@@ -359,6 +390,12 @@ vid.addEventListener('error',()=>vbox.classList.add('err'));
 $('vclose').addEventListener('click',fecharVideo);
 vmodal.addEventListener('click',e=>{if(e.target===vmodal)fecharVideo();});
 document.querySelectorAll('.ph').forEach(b=>{b.addEventListener('click',()=>abrirVideo(b.dataset.who));b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();abrirVideo(b.dataset.who);}});});
+
+
+document.querySelectorAll('.mph').forEach(b=>{
+  b.querySelector('img').src=document.querySelector('.ph[data-who="'+b.dataset.who+'"] img').src;
+  b.addEventListener('click',()=>abrirVideo(b.dataset.who));
+});
 
 /* confirmar presença -> nome -> WhatsApp */
 const rmodal=$('rmodal'),rname=$('rname'),rerr=$('rerr');
