@@ -442,7 +442,7 @@ $('rform').addEventListener('submit',e=>{
   e.preventDefault();
   const nome=rname.value.trim();
   if(!nome){rerr.textContent='Digite seu nome pra confirmar.';rname.focus();return;}
-  const msg=`Eu, ${nome}, confirmo minha presença no 'Cont X Bettega Funkstation' dia 21/11`;
+  const msg=`Eu, ${nome}, confirmo minha presença no 'Cont XX Bettega Funkstation' dia 21/11`;
   if(!rquem){rform.classList.remove('step2');return;}
   const url='https://wa.me/'+WHATSAPPS[rquem]+'?text='+encodeURIComponent(msg);
   const w=window.open(url,'_blank','noopener');
