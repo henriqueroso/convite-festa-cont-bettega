@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Cont X Bettega · Funkstation</title>
+<title>Cont XX Bettega · Funkstation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Permanent+Marker&display=swap" rel="stylesheet">
 <style>
@@ -164,6 +164,16 @@ button{font:inherit}
 .rsend{font-family:var(--disp);letter-spacing:.1em;text-transform:uppercase;font-size:17px;padding:13px;color:#fff;background:linear-gradient(180deg,#3d5afe,#161ca8);border:1px solid #8fa4ff;cursor:pointer;box-shadow:0 0 16px rgba(61,90,254,.8)}
 .rcancel{background:none;border:0;color:#8fa4ff;cursor:pointer;font-size:14px;padding:4px}
 .rerr{color:#ff9db0;font-size:13px;min-height:16px}
+.rpick{display:flex;gap:14px;justify-content:center}
+.rpb{flex:1;max-width:150px;aspect-ratio:560/630;position:relative;overflow:hidden;padding:0;cursor:pointer;border:2px solid var(--neon);box-shadow:0 0 16px rgba(61,90,254,.7);background:radial-gradient(ellipse at 50% 100%,rgba(70,100,255,.7),#03041f 70%);-webkit-tap-highlight-color:transparent;transition:transform .2s,box-shadow .2s}
+.rpb img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:bottom}
+.rpb:hover,.rpb:active{transform:scale(1.04);box-shadow:0 0 26px rgba(143,164,255,.95)}
+.rpb:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.rsel{width:84px;aspect-ratio:560/630;position:relative;overflow:hidden;margin:0 auto;border:2px solid var(--neon);box-shadow:0 0 16px rgba(61,90,254,.7);background:radial-gradient(ellipse at 50% 100%,rgba(70,100,255,.7),#03041f 70%)}
+.rsel img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:bottom}
+.rstep2{display:none;flex-direction:column;gap:14px}
+.rbox.step2 .rstep1{display:none}.rbox.step2 .rstep2{display:flex}
+.rstep1{display:flex;flex-direction:column;gap:14px}
 
 /* vídeo */
 .vmodal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;gap:clamp(16px,2.4vw,36px);padding:clamp(12px,2vw,32px);overflow:auto;background:radial-gradient(ellipse at 50% 0,rgba(61,90,254,.4),transparent 55%),#01010a}
@@ -318,11 +328,22 @@ button{font:inherit}
 <div class="rmodal" id="rmodal" role="dialog" aria-modal="true" aria-label="Confirmar presença">
   <form class="rbox" id="rform" autocomplete="off">
     <h3>Confirmar presença</h3>
-    <p>Qual o seu nome?</p>
-    <input id="rname" type="text" maxlength="60" placeholder="Digite seu nome" autocomplete="name">
-    <div class="rerr" id="rerr"></div>
-    <button class="rsend" type="submit">Enviar no WhatsApp</button>
-    <button class="rcancel" id="rcancel" type="button">Cancelar</button>
+    <div class="rstep1">
+      <p>Quem te convidou?</p>
+      <div class="rpick">
+        <button class="rpb" type="button" data-who="cont" aria-label="Cont"><img alt="Cont"></button>
+        <button class="rpb" type="button" data-who="bettega" aria-label="Bettega"><img alt="Bettega"></button>
+      </div>
+      <button class="rcancel" id="rcancel" type="button">Cancelar</button>
+    </div>
+    <div class="rstep2">
+      <div class="rsel"><img id="rselimg" alt=""></div>
+      <p>Qual o seu nome?</p>
+      <input id="rname" type="text" maxlength="60" placeholder="Digite seu nome" autocomplete="name">
+      <div class="rerr" id="rerr"></div>
+      <button class="rsend" type="submit">Enviar no WhatsApp</button>
+      <button class="rcancel" id="rback" type="button">← Voltar</button>
+    </div>
   </form>
 </div>
 
@@ -340,7 +361,7 @@ const ARQUIVOS={
   bettega:'bettega.mp4'
 };
 const NOMES={cont:'Cont',bettega:'Bettega'};
-const WHATSAPP='5555991009597';
+const WHATSAPPS={cont:'555591009597',bettega:'555596388838'};
 // ================================================================================
 const $=id=>document.getElementById(id);
 const bgm=$('bgm'),snd=$('snd'),vid=$('vid'),vmodal=$('vmodal'),vbox=$('vbox');
@@ -398,9 +419,20 @@ document.querySelectorAll('.mph').forEach(b=>{
 });
 
 /* confirmar presença -> nome -> WhatsApp */
-const rmodal=$('rmodal'),rname=$('rname'),rerr=$('rerr');
-function abrirRsvp(){rerr.textContent='';rmodal.classList.add('show');setTimeout(()=>rname.focus(),50);}
+const rmodal=$('rmodal'),rname=$('rname'),rerr=$('rerr'),rform=$('rform');
+let rquem=null;
+document.querySelectorAll('.rpb').forEach(b=>{
+  b.querySelector('img').src=document.querySelector('.ph[data-who="'+b.dataset.who+'"] img').src;
+  b.addEventListener('click',()=>{
+    rquem=b.dataset.who;
+    $('rselimg').src=b.querySelector('img').src;$('rselimg').alt=NOMES[rquem];
+    rform.classList.add('step2');rerr.textContent='';
+    setTimeout(()=>rname.focus(),50);
+  });
+});
+function abrirRsvp(){rquem=null;rform.classList.remove('step2');rerr.textContent='';rmodal.classList.add('show');}
 function fecharRsvp(){rmodal.classList.remove('show');}
+$('rback').addEventListener('click',()=>{rform.classList.remove('step2');rerr.textContent='';});
 $('rsvp').addEventListener('click',abrirRsvp);
 $('rcancel').addEventListener('click',fecharRsvp);
 rmodal.addEventListener('click',e=>{if(e.target===rmodal)fecharRsvp();});
@@ -409,7 +441,8 @@ $('rform').addEventListener('submit',e=>{
   const nome=rname.value.trim();
   if(!nome){rerr.textContent='Digite seu nome pra confirmar.';rname.focus();return;}
   const msg=`Eu, ${nome}, confirmo minha presença no 'Cont X Bettega Funkstation' dia 21/11`;
-  const url='https://wa.me/'+WHATSAPP+'?text='+encodeURIComponent(msg);
+  if(!rquem){rform.classList.remove('step2');return;}
+  const url='https://wa.me/'+WHATSAPPS[rquem]+'?text='+encodeURIComponent(msg);
   const w=window.open(url,'_blank','noopener');
   if(!w)window.location.href=url;
   fecharRsvp();rname.value='';
